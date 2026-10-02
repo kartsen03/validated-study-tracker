@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Studies{% endblock %}
+{% block content %}
+<div class="heading-row">
+  <h1>Studies</h1>
+  <a class="button" href="{{ url_for('main.study_new') }}">New study</a>
+</div>
+{% if studies %}
+<table>
+  <thead>
+    <tr><th>Study ID</th><th>Title</th><th>Phase</th><th>Sponsor</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    {% for study in studies %}
+    <tr>
+      <td class="nowrap"><a href="{{ url_for('main.study_detail', study_id=study.study_id) }}">{{ study.study_id }}</a></td>
+      <td>{{ study.title }}</td>
+      <td class="nowrap">{{ study.phase }}</td>
+      <td>{{ study.sponsor }}</td>
+      <td><span class="status status-{{ study.status|lower }}">{{ study.status|status_label }}</span></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No studies yet.</p>
+{% endif %}
+{% endblock %}

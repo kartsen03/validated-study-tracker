@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Audit history: {{ study_id }}{% endblock %}
+{% block content %}
+<h1>Audit history: {{ study_id }}</h1>
+{% if deleted %}
+  <p class="notice">This study has been deleted. Its history is kept here permanently.</p>
+{% else %}
+  <p><a href="{{ url_for('main.study_detail', study_id=study_id) }}">Back to {{ study_id }}</a></p>
+{% endif %}
+<p class="muted">Oldest first. Entries are append-only: they can't be edited or removed.</p>
+<div class="scroll">
+<table class="audit">
+  <thead>
+    <tr>
+      <th>#</th><th>Recorded (UTC)</th><th>User</th><th>Action</th>
+      <th>Field</th><th>Old value</th><th>New value</th><th>Reason for change</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in entries %}
+    <tr id="entry-{{ entry.id }}">
+      <td>{{ entry.id }}</td>
+      <td class="nowrap">{{ entry.recorded_at }}</td>
+      <td>{{ entry.username }}</td>
+      <td>{{ entry.action }}</td>
+      <td>{{ entry.field if entry.field is not none else "(whole study)" }}</td>
+      <td>{{ entry.old_value if entry.old_value is not none else "—" }}</td>
+      <td>{{ entry.new_value if entry.new_value is not none else "—" }}</td>
+      <td>{{ entry.reason if entry.reason is not none else "(initial entry)" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ study.study_id }}{% endblock %}
+{% block content %}
+<div class="heading-row">
+  <h1>{{ study.study_id }}</h1>
+  <span class="status status-{{ study.status|lower }}">{{ status.label }}</span>
+</div>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+<dl class="fields">
+  <dt>{{ labels.title }}</dt><dd>{{ study.title }}</dd>
+  <dt>{{ labels.phase }}</dt><dd>{{ study.phase }}</dd>
+  <dt>{{ labels.sponsor }}</dt><dd>{{ study.sponsor }}</dd>
+  <dt>{{ labels.target_enrollment }}</dt><dd>{{ "{:,}".format(study.target_enrollment) }}</dd>
+  <dt>{{ labels.site_count }}</dt><dd>{{ "{:,}".format(study.site_count) }}</dd>
+  <dt>Status</dt><dd>{{ status.label }}</dd>
+</dl>
+
+<p class="links">
+  <a class="button" href="{{ url_for('main.study_edit', study_id=study.study_id) }}">Edit fields</a>
+  <a href="{{ url_for('main.study_audit', study_id=study.study_id) }}">Audit history</a>
+</p>
+
+<section>
+  <h2>Change status</h2>
+  {% if next_statuses %}
+  <form method="post" action="{{ url_for('main.study_status', study_id=study.study_id) }}" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="status">New status</label>
+    <select id="status" name="status" required>
+      {% for option in next_statuses %}
+        <option value="{{ option.value }}">{{ option.label }}</option>
+      {% endfor %}
+    </select>
+    <label for="status-reason">Reason for change</label>
+    <textarea id="status-reason" name="reason" maxlength="500" rows="2" required></textarea>
+    <div class="actions"><button type="submit">Change status</button></div>
+  </form>
+  {% else %}
+  <p class="muted">{{ status.label }} is a final status, so this study's status can't change.
+    Its fields can still be corrected, with a reason.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Delete</h2>
+  <form method="post" action="{{ url_for('main.study_delete', study_id=study.study_id) }}" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <p class="muted">The study leaves the list. Its audit history is kept, and its ID can't be used again.</p>
+    <label for="delete-reason">Reason for change</label>
+    <textarea id="delete-reason" name="reason" maxlength="500" rows="2" required></textarea>
+    <div class="actions"><button type="submit" class="danger">Delete study</button></div>
+  </form>
+</section>
+{% endblock %}

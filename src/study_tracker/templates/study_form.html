@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ "New study" if mode == "new" else "Edit " ~ study.study_id }}{% endblock %}
+{% macro field_error(name) %}
+  {% if errors.get(name) %}<p class="field-error" id="{{ name }}-error">{{ errors[name] }}</p>{% endif %}
+{% endmacro %}
+{% block content %}
+<h1>{{ "New study" if mode == "new" else "Edit " ~ study.study_id }}</h1>
+{% if errors %}
+  <p class="error" role="alert">
+    {% if errors.get("_form") %}{{ errors["_form"] }}{% else %}Nothing was saved. Fix the fields marked below.{% endif %}
+  </p>
+{% endif %}
+<form method="post" class="stack">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  {% if mode == "new" %}
+    <label for="study_id">{{ labels.study_id }}</label>
+    <input id="study_id" name="study_id" value="{{ values.get('study_id', '') }}" maxlength="20" required>
+    <p class="hint">3 to 20 letters, digits or hyphens. It can't be changed later.</p>
+    {{ field_error("study_id") }}
+  {% else %}
+    <p><strong>{{ labels.study_id }}:</strong> {{ study.study_id }} <span class="muted">(permanent)</span></p>
+  {% endif %}
+
+  <label for="title">{{ labels.title }}</label>
+  <input id="title" name="title" value="{{ values.get('title', '') }}" maxlength="300" required>
+  {{ field_error("title") }}
+
+  <label for="phase">{{ labels.phase }}</label>
+  <select id="phase" name="phase" required>
+    <option value="">Choose…</option>
+    {% for phase in phases %}
+      <option value="{{ phase }}" {% if values.get('phase') == phase %}selected{% endif %}>{{ phase }}</option>
+    {% endfor %}
+  </select>
+  {{ field_error("phase") }}
+
+  <label for="sponsor">{{ labels.sponsor }}</label>
+  <input id="sponsor" name="sponsor" value="{{ values.get('sponsor', '') }}" maxlength="200" required>
+  {{ field_error("sponsor") }}
+
+  <label for="target_enrollment">{{ labels.target_enrollment }}</label>
+  <input id="target_enrollment" name="target_enrollment" value="{{ values.get('target_enrollment', '') }}" inputmode="numeric" required>
+  {{ field_error("target_enrollment") }}
+
+  <label for="site_count">{{ labels.site_count }}</label>
+  <input id="site_count" name="site_count" value="{{ values.get('site_count', '') }}" inputmode="numeric" required>
+  {{ field_error("site_count") }}
+
+  {% if mode == "edit" %}
+    <label for="reason">Reason for change</label>
+    <textarea id="reason" name="reason" maxlength="500" rows="3" required>{{ values.get('reason', '') }}</textarea>
+    <p class="hint">Recorded in the audit trail with every field you change.</p>
+    {{ field_error("reason") }}
+  {% endif %}
+
+  <div class="actions">
+    <button type="submit">{{ "Create study" if mode == "new" else "Save changes" }}</button>
+    <a href="{{ url_for('main.study_list') if mode == 'new' else url_for('main.study_detail', study_id=study.study_id) }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

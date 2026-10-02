@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Studies{% endblock %} · Validated Study Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site">
+    <a class="brand" href="{{ url_for('main.study_list') }}">Validated Study Tracker</a>
+    {% if current_user %}
+      <form method="post" action="{{ url_for('main.sign_out') }}" class="who">
+        <span>{{ current_user.display_name }}</span>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="link">Sign out</button>
+      </form>
+    {% endif %}
+  </header>
+  <main>
+    {% for message in get_flashed_messages() %}
+      <p class="flash" role="status">{{ message }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site">
+    Inspired by GxP and 21 CFR Part 11 practice. A portfolio project: not validated, and it makes no claim of compliance.
+  </footer>
+</body>
+</html>
