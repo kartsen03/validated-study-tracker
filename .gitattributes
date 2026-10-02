@@ -1,0 +1,6 @@
+# Normalise to LF in the repository. Development happens on Windows and CI runs on
+# Linux, and generated documents (the traceability matrix) are compared byte for byte.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary

@@ -1,0 +1,30 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Local database and test output (reproducible, not artifacts)
+instance/
+*.sqlite
+*.sqlite3
+*.db
+reports/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

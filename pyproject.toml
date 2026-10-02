@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "validated-study-tracker"
+version = "1.0.0"
+description = "A clinical study tracker with an append-only audit trail and requirement-traced tests, inspired by GxP practice."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [{ name = "Karthik Sengupta" }]
+dependencies = [
+    "flask>=3.1",
+    "sqlalchemy>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=6",
+    "ruff>=0.8",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+study_tracker = ["templates/*.html", "static/*.css"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"
+# A warning is a defect waiting to happen; fail the run on any.
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["study_tracker"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 90
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
