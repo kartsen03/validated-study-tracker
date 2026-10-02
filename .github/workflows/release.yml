@@ -1,0 +1,64 @@
+name: Release
+
+# Pushing a version tag (v1.0.0) runs the full verification again on the tagged commit.
+# The release is created only if lint, every test and the traceability check pass, and
+# its notes are the test execution report for that exact commit.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Verify and release ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Run tests
+        run: >
+          pytest
+          --junitxml=reports/junit.xml
+          --cov --cov-report=term
+          --cov-report=xml:reports/coverage.xml
+          --cov-report=html:reports/coverage-html
+
+      # Also fails if the tag doesn't match the version in pyproject.toml.
+      - name: Write the test execution report
+        run: >
+          python scripts/traceability.py
+          --junit reports/junit.xml
+          --check
+          --report reports/test_execution_report.md
+          --coverage reports/coverage.xml
+          --commit ${{ github.sha }}
+          --release ${{ github.ref_name }}
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          (cd reports && zip -q -r coverage-html.zip coverage-html)
+          gh release create "${{ github.ref_name }}" \
+            reports/test_execution_report.md \
+            reports/junit.xml \
+            reports/coverage.xml \
+            reports/coverage-html.zip \
+            docs/traceability_matrix.md \
+            --title "${{ github.ref_name }}" \
+            --notes-file reports/test_execution_report.md \
+            --verify-tag

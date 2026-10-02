@@ -16,7 +16,7 @@ __pycache__/
 coverage.xml
 htmlcov/
 
-# Local database and test output (reproducible, not artifacts)
+# Local database and test output (reproducible; CI publishes reports as artifacts)
 instance/
 *.sqlite
 *.sqlite3
