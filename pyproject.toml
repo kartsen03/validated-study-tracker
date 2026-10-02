@@ -20,7 +20,8 @@ dependencies = [
 dev = [
     "pytest>=8",
     "pytest-cov>=6",
-    "ruff>=0.8",
+    # Pinned: newer ruff releases add lint rules, and CI should only fail on code changes.
+    "ruff~=0.16.10",
 ]
 
 [tool.setuptools.packages.find]
@@ -31,12 +32,15 @@ study_tracker = ["templates/*.html", "static/*.css"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# scripts/ holds the traceability tool, which has its own tests.
+pythonpath = ["scripts"]
 addopts = "--strict-markers"
 # A warning is a defect waiting to happen; fail the run on any.
 filterwarnings = ["error"]
 
 [tool.coverage.run]
-source = ["study_tracker"]
+# The application and the tooling that decides whether a release is valid.
+source = ["study_tracker", "scripts"]
 branch = true
 
 [tool.coverage.report]
